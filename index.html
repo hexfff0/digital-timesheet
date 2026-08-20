@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Timesheet</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- =============== TOP BAR =============== -->
+  <header id="topbar">
+    <div class="brand">
+      <h1>Timesheet</h1>
+      <div class="sub">Animation exposure / timing sheet</div>
+    </div>
+    <div class="topbar-group"
+      title="Mouse wheel = zoom at the cursor. Hold Space (or the middle button) and drag = pan. In the all-pages view, the wheel scrolls between pages instead (Ctrl/Cmd+wheel zooms).">
+      <button type="button" id="zoomOutBtn" class="topbar-icon-btn" title="Zoom out">−</button>
+      <button type="button" id="zoomInBtn" class="topbar-icon-btn" title="Zoom in">+</button>
+      <button type="button" id="zoomResetBtn">Reset view</button>
+      <button type="button" id="viewModeBtn">1 page</button>
+    </div>
+    <div class="topbar-group"
+      title="Pen draws freehand strokes over the sheet (kept as JSON in state, per page); Eraser deletes the whole stroke you click/tap. Pick the pen color and width. Space+drag still pans and the wheel still zooms while a tool is active.">
+      <button type="button" id="penToolBtn" class="topbar-icon-btn"
+        title="Pen — draw freehand strokes (click again to go back to select)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+          <path
+            d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+        </svg>
+      </button>
+      <button type="button" id="eraserToolBtn" class="topbar-icon-btn"
+        title="Eraser — click/tap a stroke to delete the whole stroke (click again to go back to select)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+          <path
+            d="M16.24 3.56l4.2 4.2a1.5 1.5 0 0 1 0 2.12l-9.9 9.9h-4.24l-4.2-4.2a1.5 1.5 0 0 1 0-2.12l9.9-9.9a1.5 1.5 0 0 1 2.12 0zm-1.06 5.3L7.6 16.44l1.5 1.5 7.6-7.6-1.5-1.5zM2 20.5h9.5l-1.5-1.5H2v1.5z" />
+        </svg>
+      </button>
+      <input type="color" id="inkColorInput" value="#e53935" title="Pen color">
+      <input type="range" id="inkWidthInput" min="1" max="8" step="1" value="2" title="Pen width">
+    </div>
+    <div class="topbar-group"
+      title="1 page = 6 seconds (144 frames). When TIME exceeds 6 s, the next page is added automatically.">
+      <button type="button" id="prevPageBtn" class="topbar-icon-btn" title="Previous page">‹</button>
+      <span id="pageLabel" class="page-label">Page 1 / 1</span>
+      <button type="button" id="nextPageBtn" class="topbar-icon-btn" title="Next page">›</button>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" id="exportBtn" class="topbar-btn">Export ▾</button>
+      <button type="button" id="importBtn" class="topbar-btn">Import ▾</button>
+    </div>
+  </header>
+
+  <div id="app">
+
+    <!-- =============== SIDE VIEW / CONTROL PANEL =============== -->
+    <aside id="controls">
+
+      <!-- ============ HEADER (title table) ============ -->
+      <fieldset>
+        <legend>Header</legend>
+        <div class="row">
+          <label class="chk"><input type="checkbox" id="chkHeaderTable" checked> Show data table</label>
+        </div>
+        <div class="row">
+          <label class="chk"
+            title="Draw red / slash marks under the end-of-time line — a warning-style hatch (//////) across the whole table, one uniform angle, 3 cells tall."><input
+              type="checkbox" id="chkEndSlash" checked> Red slash under end-of-time line</label>
+        </div>
+        <div id="headerValueInputs"></div>
+        <div class="hint"
+          title="Format: &quot;seconds+frames&quot;, e.g. 1+12 = 1 second 12 frames. A bare number means whole seconds (e.g. 3 = 3 seconds). The last mark (or Keyframe/Breakdown) in each column automatically extends its line down to this final frame.">
+          Format: seconds+frames (1+12) or seconds (3).</div>
+        <div class="hint"
+          title="Type the title info here, or click a cell directly on the sheet to edit it there. TIME stays in sync with the sheet either way.">
+          Type here or click the cell on the sheet.</div>
+      </fieldset>
+
+      <!-- ============ SHEET SECTIONS ============ -->
+      <fieldset>
+        <legend>Sections</legend>
+
+        <div class="sec">
+          <div class="sec-head">
+            <input type="text" class="sec-name-input" data-sec="ACTION" value="ACTION"
+              title="Rename this section's header — leave empty for the default name.">
+            <label class="chk"><input type="checkbox" class="secVisible" data-sec="ACTION" checked> Show</label>
+          </div>
+          <div class="sec-row">
+            <label class="chk"><input type="checkbox" class="secHeader" data-sec="ACTION" checked> Header</label>
+            <label class="chk"><input type="checkbox" class="secLetters" data-sec="ACTION" checked> Letters</label>
+            <span class="spacer"></span>
+            <div class="stepper">
+              <button type="button" class="colMinus" data-sec="ACTION">−</button>
+              <input type="number" id="colCountAction" min="1" max="12" value="8" readonly>
+              <button type="button" class="colPlus" data-sec="ACTION">+</button>
+            </div>
+          </div>
+          <div class="col-labels" id="actionColLabels"
+            title="Rename each column's letter (A B C…) — leave empty for the default letter."></div>
+          <div class="hint"
+            title="Hiding a row actually removes it (not just its text) — the remaining rows expand to fill the space instead. The frame lines below always stay evenly spaced across every column.">
+            Hiding a row removes it — the rest expand.</div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head">
+            <input type="text" class="sec-name-input" data-sec="SOUND" value="SOUND"
+              title="Rename this section's header — leave empty for the default name.">
+            <label class="chk"><input type="checkbox" class="secVisible" data-sec="SOUND" checked> Show</label>
+          </div>
+          <div class="sec-row">
+            <label class="chk"><input type="checkbox" class="secHeader" data-sec="SOUND" checked> Header</label>
+          </div>
+          <div class="hint"
+            title="Narrow single column with an invisible frame grid — no divider lines, no letter row, but each frame row is still clickable. Click or drag across rows to select a frame range, type the dialogue text, press Enter. Click an existing line to edit it; drag its top/bottom edge to resize the span.">
+            Narrow single column — click/drag rows to type dialogue (invisible grid).</div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head">
+            <input type="text" class="sec-name-input" data-sec="INBETWEEN" value="INBETWEEN"
+              title="Rename this section's header — leave empty for the default name.">
+            <label class="chk"><input type="checkbox" class="secVisible" data-sec="INBETWEEN" checked> Show</label>
+          </div>
+          <div class="sec-row">
+            <label class="chk"><input type="checkbox" class="secHeader" data-sec="INBETWEEN" checked> Header</label>
+            <label class="chk"><input type="checkbox" class="secLetters" data-sec="INBETWEEN" checked> Letters</label>
+          </div>
+          <div class="col-labels" id="inbetweenColLabels"
+            title="Rename each column's letter (A B C…) — leave empty for the default letter."></div>
+          <div class="hint" title="Always the same number of columns as ACTION.">Same columns as ACTION (<span
+              id="inbetweenCountLabel">8</span>)</div>
+          <button type="button" id="makeInbetweenBtn" class="btn-primary">Make In-Between</button>
+          <label class="chk block" title="Keep Keyframe/Breakdown symbols (off = plain numbers only)."><input
+              type="checkbox" id="chkInbetweenSymbols" checked> Keep symbols</label>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head">
+            <input type="text" class="sec-name-input" data-sec="CAMERA" value="CAMERA"
+              title="Rename this section's header — leave empty for the default name.">
+            <label class="chk"><input type="checkbox" class="secVisible" data-sec="CAMERA" checked> Show</label>
+          </div>
+          <div class="sec-row">
+            <label class="chk"><input type="checkbox" class="secHeader" data-sec="CAMERA" checked> Header</label>
+            <label class="chk"><input type="checkbox" class="secLetters" data-sec="CAMERA" checked> Numbers</label>
+            <span class="spacer"></span>
+            <div class="stepper"
+              title="Number of CAMERA lanes (1–12). Type a number or use +/−. New lanes appear to the right; keyframe labels renumber left-to-right automatically.">
+              <button type="button" class="colMinus" data-sec="CAMERA">−</button>
+              <input type="number" id="colCountCamera" min="1" max="12" value="3">
+              <button type="button" class="colPlus" data-sec="CAMERA">+</button>
+            </div>
+          </div>
+          <div class="sec-row"
+            title="Where each camera note's circled KEYFRAME labels (A B C D E — the head/tail and middle keyframe names) sit, PER PAGE — each page remembers its own placement: Side = beside the guide line at each keyframe's row (classic); Above / Below = the head label above the note's top edge and the tail label below its bottom edge (flipping only when the preferred spot would cover the section header — the header is never covered); Dynamic = Above / Below normally, but Side when the label would cover the section header, another note's shape, another note's own rows, or another note's boundary label (notes touching or one row apart) — when two notes collide, BOTH boundary labels move to the side. In Dynamic the middle keyframe labels always stay beside the keyframe. The header is never covered; a shape that must be covered is the one that gets covered. The red name label (PAN / OL / …) stays beside the note's middle as always. When you switch pages, that page's own placement is shown and its labels renumber in that page's order.">
+            <span class="lbl" style="flex:1">Label placement</span>
+            <select id="cameraLabelModeSelect">
+              <option value="side">Side</option>
+              <option value="vertical">Above / Below</option>
+              <option value="dynamic">Dynamic</option>
+            </select>
+          </div>
+          <div class="col-labels" id="cameraColLabels"
+            title="Rename each camera lane's number (1 2 3…) — leave empty for the default number."></div>
+          <div class="hint"
+            title="Each column is a camera lane. Click or drag inside a lane to select a frame range, type the camera note (e.g. PAN), press Enter. Notes keep their lane when edited; overlapping notes in the same lane are staggered sideways. Drag a note's body to move it to another lane or frame range; drag its top/bottom edge to resize.">
+            <span id="cameraLanesHint">1 2 3</span> are camera lanes — click/drag a lane to add a note.
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head">
+            <input type="text" class="sec-name-input" data-sec="MEMO" value="MEMO"
+              title="Rename the memo box label — leave empty for the default name.">
+          </div>
+          <div class="sec-row">
+            <label class="chk"><input type="checkbox" id="chkMemoLabel" checked> "MEMO" label</label>
+            <label class="chk"><input type="checkbox" id="chkMemoBorder" checked> Border</label>
+          </div>
+          <div class="hint"
+            title="The notes box sits between the header table and the main grid. These toggle its label and border independently.">
+            Notes box below the header table.</div>
+          <button type="button" id="autoCameraMemoBtn" class="btn-primary"
+            title="Write every camera note currently on the sheet into the MEMO box, one line each in frame order (e.g. Ⓐ→Ⓑ PAN, BG1 ⋈ BG2 O.L). Appends on a new line after existing memo text.">Auto
+            camera memo</button>
+        </div>
+      </fieldset>
+
+      <!-- ============ DIALOGUE & CAMERA ============ -->
+      <fieldset>
+        <legend>Dialogue &amp; Camera</legend>
+        <div class="hint"
+          title="Type one line per entry, in the columns shown. FROM/TO must be seconds+frames (S+F) — 0+00 = the first frame of the current page. Dialogue: FROM | TO | SPEAKER | TEXT, with an optional (SE)/(M)/(OFF)… suffix on the speaker. Camera: FROM | TO | TYPE | NAME | A | B, with optional trailing S+F (ア), LABEL:S+F (middle keyframe) and @TYPE (next segment's interpolation). A malformed line is reported under the box and skipped — never silently lost. Lines stay in sync with what you drag/edit on the sheet.">
+          One line per entry. FROM/TO are S+F (0+00 = first frame of this page). Bad lines show up under the box.</div>
+        <div class="row" style="align-items:stretch;">
+          <div style="flex:1;min-width:0;">
+            <label class="lbl" for="dialogueTextarea">Dialogue (SOUND column)</label>
+            <textarea id="dialogueTextarea" rows="5" spellcheck="false"
+              placeholder="0+00 | 0+12 | ALICE (SE) | Hello!"></textarea>
+            <div id="dialogueStatus" class="ta-status" aria-live="polite"></div>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <label class="lbl" for="cameraTextarea">Camera (CAMERA lanes)</label>
+            <textarea id="cameraTextarea" rows="5" spellcheck="false"
+              placeholder="0+00 | 2+00 | QTU | Zoom to CU | A | B | 0+12"></textarea>
+            <div id="cameraStatus" class="ta-status" aria-live="polite"></div>
+          </div>
+        </div>
+        <details class="format-ref">
+          <summary>Format reference</summary>
+          <div class="format-body">
+            <p class="hint" style="margin-top:4px">One entry per line; columns line up automatically. FROM/TO and every
+              timecode are <b>S+F</b> (seconds+frames, 24 f/s) relative to this page — <code>0+00</code> = frame 1.</p>
+            <div class="format-col">
+              <div class="format-title">Dialogue</div>
+              <pre><code>FROM   | TO   | SPEAKER   | TEXT</code></pre>
+              <pre><code>0+00   | 0+12 | ALICE (SE)| (gasp)</code></pre>
+              <pre><code>2+12   | 4+00 | BOB (M)   | The door is open.</code></pre>
+              <p class="hint">Optional <code>(SE)</code> <code>(M)</code> <code>(OFF)</code> <code>(ME)</code>
+                <code>(N)</code> <code>(T)</code> <code>(ON)</code> <code>(背)</code> <code>(ノンモン)</code>
+                <code>(独)</code> tag → drawn red above the speaker.
+              </p>
+            </div>
+            <div class="format-col">
+              <div class="format-title">Camera</div>
+              <pre><code>FROM | TO | TYPE | NAME | A | B</code></pre>
+              <pre><code>0+00 | 0+12 | PAN | PAN | A | B</code></pre>
+              <pre><code>0+12 | 2+00 | QTU | Zoom to CU | A | B | 0+12</code></pre>
+              <pre><code>0+00 | 3+00 | Follow | Follow | A | B | C:1+12 | @OL</code></pre>
+              <p class="hint">Trailing: bare <code>S+F</code> = ア (QTU/QTB animation start), <code>LABEL:S+F</code> =
+                middle keyframe, <code>@TYPE</code> = next segment's interpolation. NAME defaults to TYPE.</p>
+            </div>
+            <div class="format-col">
+              <div class="format-title">Camera types</div>
+              <div class="type-grid">
+                <span class="type-chip">PAN</span><span class="type-chip">Follow</span><span
+                  class="type-chip">TU</span><span class="type-chip">TB</span>
+                <span class="type-chip">QTU</span><span class="type-chip">QTB</span><span
+                  class="type-chip">FI</span><span class="type-chip">FO</span>
+                <span class="type-chip">WI</span><span class="type-chip">WO</span><span
+                  class="type-chip">フォーカスイン</span><span class="type-chip">フォーカスアウト</span>
+                <span class="type-chip">OL</span><span class="type-chip">ハンディぶれ</span><span class="type-chip">+ any free
+                  name</span>
+              </div>
+            </div>
+          </div>
+        </details>
+      </fieldset>
+
+      <!-- ============ MARKS & SHORTHAND ============ -->
+      <fieldset>
+        <legend>Marks &amp; Shorthand</legend>
+        <div class="hint"
+          title="Left-click a frame cell in an ACTION column to select it (yellow highlight) and type a number right away, or type &quot;x&quot; (no image) / &quot;.&quot; (in-between) / &quot;r&quot; (repeat) / &quot;s&quot; (stop). Press Enter to confirm, Backspace to edit, Esc to cancel. Right-click a cell to pick an enclosing symbol (○ Keyframe / △ Breakdown / plain number / ✕ no image / • In-between / ⟲ Repeat / 止 Stop) or delete it. Lines automatically connect each number to the next one in the same column, whatever the symbol. Click any cell on the header table (EPISODE/TITLE/CUT-SCENE/TIME/ANIMATOR/PAGE/COMPOSITOR) to type data (TIME uses seconds+frames, e.g. 1+12). Click the MEMO box below the header table to type notes (Enter = new line, Esc = save and exit). Drag a cell with a number/symbol onto another cell to move it (if the target already has data they swap places). Drag the red line (end of time) up/down to adjust TIME.">
+          Left-click a cell to type (x / . / r / s; Enter, Esc). Right-click for symbols or delete. Drag a mark to move
+          it; drag the red line to adjust TIME.</div>
+        <button type="button" id="clearMarksBtn" class="btn-danger">Clear all Keyframe/Breakdown</button>
+        <div id="columnShorthandContainer"></div>
+        <div class="hint"
+          title="Type numbers in order for frames 1-144 of this page, separated by spaces. Use &quot;n&quot; for an empty frame, &quot;x&quot; for no image, &quot;.&quot; for in-between, &quot;rep&quot; for repeat, &quot;stop&quot; for stop (hold), e.g. 1 2 n x . 3 n rep. Plain numbers stay plain — change them to Keyframe/Breakdown later via right-click on the grid. Press Enter or click out of the field to save.">
+          Frames 1–144, space-separated: n = empty, x = no image, . = in-between, rep = repeat, stop = stop.</div>
+      </fieldset>
+
+      <!-- ============ BOOKS ============ -->
+      <fieldset>
+        <legend>Books</legend>
+        <div class="hint"
+          title="Right-click a column divider in the header band above the frame grid (or on the Book label/spine itself) in ACTION to name a Book — the grid rows below stay free for the mark/symbol menu. Add several names one at a time and they stack at the same position — works both by right-clicking and by typing in this sidebar.">
+          Right-click a divider in the header band above the grid to name a Book; add several names one at a time and
+          they stack at the same position.</div>
+        <div class="row">
+          <span class="lbl">Frame shape</span>
+          <select id="bookShapeSelect">
+            <option value="none">No frame</option>
+            <option value="oval">Oval</option>
+            <option value="rect">Rectangle</option>
+          </select>
+        </div>
+        <div class="row">
+          <span class="lbl">Overlap layout</span>
+          <select id="bookLayoutSelect"
+            title="How Book stacks that collide are untangled. Branch first: the left trunk branches left, then the right trunk branches right, and only as a last resort is a stack raised. Vertical first: every label stays on its own divider and colliding stacks are raised above each other, branching only when the space above the grid runs out.">
+            <option value="branch">Branch first</option>
+            <option value="vertical">Vertical first</option>
+          </select>
+        </div>
+        <div class="row">
+          <label class="chk"><input type="checkbox" id="chkBookVertical"> Vertical text</label>
+        </div>
+        <div id="bookListContainer"></div>
+      </fieldset>
+
+
+      <!-- ============ LAYOUT (CUSTOMIZE) ============ -->
+      <fieldset>
+        <legend>Layout (Customize)</legend>
+        <div class="row">
+          <button type="button" id="customizeToggleBtn" class="btn-secondary flex">Enter resize mode
+            (Customize)</button>
+          <button type="button" id="syncToggleBtn" class="btn-secondary flex">Sync left-right: Off</button>
+        </div>
+        <div class="row">
+          <button type="button" id="layoutExportBtn" class="btn-secondary flex"
+            title="Download the current layout (grid sizes/offsets, header-table geometry, MEMO position, plus custom section/column/header-table names) as a JSON file.">Export
+            layout</button>
+          <button type="button" id="layoutImportBtn" class="btn-secondary flex"
+            title="Load a layout from an exported JSON file.">Import layout</button>
+          <input type="file" id="layoutImportFile" accept=".json,application/json" style="display:none;">
+        </div>
+        <div class="hint"
+          title="Layout is auto-saved as you customize (drag or type) and restored on reload. Export layout saves it to a JSON file you can import on another sheet/machine.">
+          Layout auto-saves while customizing; Export/Import carries it to another machine.</div>
+        <div class="hint"
+          title="Click the table repeatedly to drill down one level at a time: whole table → left/right → Section → combined Header → header bar / letter row separately. Click outside the selected box to go back to selecting the whole table. Drag the left/right/top/bottom edges of the blue box to resize, or drag the middle to move it freely (including the gap between the two blocks) — you can also type exact numbers below. The header data table (EPISODE/TITLE/...) and the MEMO box work the same way, as a whole or cell by cell. Turn Sync on so adjusting the left block mirrors the right block automatically at every level. At the top level, the whole table only resizes its width via left/right drags and its height via top/bottom drags, independently.">
+          Click the table to drill down; drag the blue box edges to resize or the middle to move. Sync mirrors
+          left↔right.</div>
+        <div id="layoutSelectionInfo" style="display:none;">
+          <div id="layoutSelectionLabel" class="layout-label"></div>
+          <div class="row" id="layoutScaleXRow" style="display:none;">
+            <span class="lbl">Width (%)</span>
+            <input type="number" id="layoutScaleXInput" class="num-input" min="30" max="400">
+          </div>
+          <div class="row" id="layoutScaleYRow" style="display:none;">
+            <span class="lbl">Height (%)</span>
+            <input type="number" id="layoutScaleYInput" class="num-input" min="30" max="400">
+          </div>
+          <div class="row" id="layoutWidthRow" style="display:none;">
+            <span class="lbl">Width (px)</span>
+            <input type="number" id="layoutWidthInput" class="num-input">
+          </div>
+          <div class="row" id="layoutHeightRow" style="display:none;">
+            <span class="lbl">Height (px)</span>
+            <input type="number" id="layoutHeightInput" class="num-input">
+          </div>
+          <div class="row" id="layoutSplitRow" style="display:none;">
+            <span class="lbl">Header bar ratio (%)</span>
+            <input type="number" id="layoutSplitInput" class="num-input" min="10" max="90">
+          </div>
+        </div>
+        <button type="button" id="layoutResetBtn" class="btn-danger">Reset all table sizes</button>
+        <div class="row" style="margin-top:6px">
+          <button type="button" id="paperImportBtn" class="btn-secondary flex"
+            title="Load a company-specified paper image (JPG / PNG) to lay under the sheet. Downscaled to fit the page; the table then draws on top at the Opacity setting.">Import
+            paper</button>
+        </div>
+        <div class="row">
+          <button type="button" id="paperClearBtn" class="btn-danger flex"
+            title="Remove the imported paper image (the table opacity stays).">Clear paper</button>
+        </div>
+        <input type="file" id="paperFileInput" accept="image/jpeg,image/png,.jpg,.jpeg,.png" style="display:none;">
+        <div class="hint" id="paperStatus">No paper image loaded.</div>
+        <div class="row"
+          title="Draw the whole table (white sheet, grid lines, text) at this opacity so the paper image underneath shows through. 100% = the normal opaque look.">
+          <span class="lbl">Table opacity</span>
+          <input type="range" id="tableOpacityInput" min="0" max="100" step="1" value="100" class="flex">
+          <span id="tableOpacityLabel" class="lbl">100%</span>
+        </div>
+      </fieldset>
+
+      <button id="resetBtn"
+        title="Restores every SETTING to default: section toggles, column counts, custom names, layout, memo box geometry, paper image, table opacity, book/in-between/camera label preferences. Does NOT clear sheet DATA (marks, dialogue, camera notes, TIME, memo text, ink).">Reset
+        section settings</button>
+    </aside>
+
+    <!-- floating popup: right-click on an ACTION cell to choose its symbol -->
+    <div id="shapeMenu">
+      <div id="shapeMenuHead">
+        <span id="shapeMenuTitle">Mark symbol</span>
+        <button type="button" id="shapeMenuCloseBtn" title="Close">✕</button>
+      </div>
+      <div class="shape-row">
+        <button type="button" data-shape="keyframe"><svg class="sym" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1" />
+          </svg>Keyframe</button>
+        <button type="button" data-shape="breakdown"><svg class="sym" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M10 3.5 L17 16.5 H3 Z" fill="none" stroke="currentColor" stroke-width="1"
+              stroke-linejoin="round" />
+          </svg>Breakdown</button>
+        <button type="button" data-shape="plain"><svg class="sym" viewBox="0 0 20 20" aria-hidden="true"><text x="10"
+              y="14.5" text-anchor="middle" font-family="inherit" font-size="16" font-weight="500"
+              fill="currentColor">12</text></svg>Remove symbol</button>
+      </div>
+      <div class="shape-row" style="margin-top:6px;">
+        <button type="button" data-shape="x"><span class="sym">✕</span>No image</button>
+        <button type="button" data-shape="."><span class="sym">•</span>In-between</button>
+      </div>
+      <div class="shape-row" style="margin-top:6px;">
+        <button type="button" data-shape="repeat"><span class="sym">⟲</span>Repeat</button>
+        <button type="button" data-shape="stop"><span class="sym">止</span>Stop</button>
+      </div>
+      <button type="button" id="markDeleteBtn">Delete this cell</button>
+    </div>
+
+    <!-- floating popup: right-click near a column-divider line in ACTION -->
+    <div id="bookMenu">
+      <div id="bookMenuHead">
+        <span id="bookMenuTitle"></span>
+        <button type="button" id="bookMenuCloseBtn" title="Close (Esc)">✕</button>
+      </div>
+      <div id="bookTagList" class="book-tags"></div>
+      <input type="text" id="bookNameInput" placeholder="Type a book name, press Enter">
+      <button type="button" id="bookDeleteBtn">Delete all at this position</button>
+    </div>
+
+    <!-- floating popup: Export button -> PNG / XDTS / JSON -->
+    <div id="exportMenu">
+      <div class="export-menu-title">Save as PNG</div>
+      <label class="chk export-all"
+        title="With this on, each size button exports one PNG per page (page1, page2, …) instead of only the current page.">
+        <input type="checkbox" id="exportAllPagesChk" checked> All pages
+      </label>
+      <button type="button" data-size="A3">A3 — 150 dpi</button>
+      <button type="button" data-size="A3H">A3 — 300 dpi</button>
+      <button type="button" data-size="A4">A4 — 150 dpi</button>
+      <button type="button" data-size="A4H">A4 — 300 dpi</button>
+      <div class="export-menu-title" style="margin-top:6px">Save as XDTS / JSON</div>
+      <button type="button" id="exportXdtsBtn"
+        title="Save as XDTS (exchangeDigitalTimeSheet) — standard structure + full app data in the timesheetApp extension.">Export
+        XDTS…</button>
+      <button type="button" id="exportJsonBtn"
+        title="Save the complete app state (marks, dialogue/camera lanes, memo, ink, layout...) as JSON.">Export JSON
+        (full)…</button>
+    </div>
+
+    <!-- floating popup: Import button -> XDTS / full JSON -->
+    <div id="importMenu">
+      <div class="export-menu-title">Import</div>
+      <button type="button" id="importXdtsBtn" title="Load a .xdts file — replaces all current sheet data.">Import
+        XDTS…</button>
+      <button type="button" id="importJsonBtn"
+        title="Load a full-state JSON exported by this app — replaces all current sheet data.">Import JSON…</button>
+    </div>
+    <input type="file" id="xdtsFileInput" accept=".xdts,.json,application/json" hidden>
+
+    <!-- floating popup: type/edit a dialogue line (SOUND) or camera note -->
+    <div id="trackMenu">
+      <div id="trackMenuHead">
+        <span id="trackMenuTitle"></span>
+        <button type="button" id="trackMenuCloseBtn" title="Close (Esc)">✕</button>
+      </div>
+      <div class="track-row" id="trackDialogueFields">
+        <input type="text" id="trackSpeakerInput" placeholder="Speaker" title="Speaker name, e.g. ALICE">
+        <select id="trackDialogueTypeSelect"
+          title="Dialogue type (auto-sheet): SE / M / ME / N / T / ON / OFF / 背 / ノンモン / 独">
+          <option value="">—</option>
+          <option value="SE">SE</option>
+          <option value="M">M</option>
+          <option value="OFF">OFF</option>
+          <option value="ME">ME</option>
+          <option value="N">N</option>
+          <option value="T">T</option>
+          <option value="ON">ON</option>
+          <option value="背">背</option>
+          <option value="ノンモン">ノンモン</option>
+          <option value="独">独</option>
+        </select>
+        <input type="text" id="trackTextInput" placeholder="Dialogue text" title="The line spoken, drawn vertically">
+      </div>
+      <div class="track-row" id="trackCameraFields">
+        <!-- options are generated from CAMERA_TYPES in edit.js -->
+        <select id="trackCameraTypeSelect"
+          title="Camera type = the interpolation between this keyframe and the next (PAN/Follow/TU/TB/QTU/QTB: straight line, FI/FO/WI/WO/フォーカス: wedge, OL: hourglass, ハンディぶれ: zigzag; any free directive draws a plain line)"></select>
+        <input type="text" id="trackNameInput" placeholder="Name"
+          title="Label printed at the segment's middle; defaults to the type but can be anything">
+        <input type="text" id="trackAruInput" placeholder="ア S+F" style="width:62px;display:none"
+          title="QTU/QTB: the circled ア position (animation start) — drag the ア on the sheet or type a frame here">
+      </div>
+      <div id="trackKfEditor" style="display:none">
+        <div class="track-kf-title">Keyframes <span id="trackSegHint"></span></div>
+        <div id="trackKfList"></div>
+        <div class="track-kf-actions">
+          <button type="button" id="trackAddKfBtn"
+            title="Insert a keyframe at the middle of this segment (or double-click the note on the sheet)">+
+            Keyframe</button>
+          <button type="button" id="trackRemoveKfBtn"
+            title="Remove the selected keyframe — the two neighboring segments merge">− Keyframe</button>
+        </div>
+      </div>
+      <div class="track-actions">
+        <button type="button" id="trackSaveBtn" title="Save (Enter)">Save</button>
+        <button type="button" id="trackDeleteBtn">Delete this entry</button>
+      </div>
+    </div>
+
+    <!-- =============== PREVIEW PANEL =============== -->
+    <main id="previewWrap">
+      <div id="zoomStage">
+        <canvas id="sheet" width="1754" height="2480"></canvas>
+      </div>
+      <!-- Native overlay editor for the memo box: rendered on top of the
+           canvas while editing so the user gets a real text field (click to
+           place the cursor, drag to select, native copy/paste/IME). -->
+      <textarea id="memoEditor" spellcheck="false" style="display:none"></textarea>
+    </main>
+
+  </div>
+
+  <script src="js/constants.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/marks.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/drawing-shapes.js"></script>
+  <script src="js/drawing-time.js"></script>
+  <script src="js/drawing-books.js"></script>
+  <script src="js/drawing.js"></script>
+  <script src="js/customize.js"></script>
+  <script src="js/edit.js"></script>
+  <script src="js/view.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/import.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

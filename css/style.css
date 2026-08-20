@@ -1,0 +1,890 @@
+  :root {
+    --topbar-h: 52px;
+    --bg: #f5f5f7;
+    --sidebar: rgba(246, 246, 248, 0.92);
+    --card: rgba(255, 255, 255, 0.88);
+    --card-border: rgba(0, 0, 0, 0.06);
+    --text: #1c1c1e;
+    --text-2: #6e6e73;
+    --text-3: #8e8e93;
+    --fill: rgba(120, 120, 128, 0.14);
+    --fill-hover: rgba(120, 120, 128, 0.22);
+    --accent: #007aff;
+    --accent-hover: #0066d6;
+    --red: #ff3b30;
+    --red-hover: #e03026;
+    --separator: rgba(0, 0, 0, 0.08);
+    --shadow-page: 0 1px 2px rgba(0,0,0,0.05), 0 6px 16px rgba(0,0,0,0.08), 0 24px 56px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: rgba(0, 122, 255, 0.22); }
+
+  /* ---------------- Top bar ---------------- */
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+  #topbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: var(--topbar-h);
+    flex: 0 0 var(--topbar-h);
+    padding: 0 18px;
+    background: rgba(250, 250, 252, 0.82);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid var(--separator);
+  }
+  #topbar .brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+  #topbar h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+  #topbar .sub {
+    font-size: 11px;
+    color: var(--text-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #topbar .topbar-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 14px;
+    border-left: 1px solid var(--separator);
+    flex-shrink: 0;
+  }
+  #topbar .topbar-group:last-of-type { border-left: none; }
+  #topbar .topbar-icon-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: var(--fill);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #topbar .topbar-icon-btn:hover { background: var(--fill-hover); }
+  #topbar .topbar-icon-btn:active { transform: scale(0.96); }
+  #topbar .topbar-icon-btn:disabled { opacity: 0.35; cursor: default; }
+  #topbar .topbar-icon-btn.active { background: var(--accent); color: #fff; }
+  #topbar .topbar-icon-btn.active:hover { background: var(--accent); }
+  #topbar #inkColorInput {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid var(--separator);
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+  }
+  #topbar #inkColorInput::-webkit-color-swatch-wrapper { padding: 2px; }
+  #topbar #inkColorInput::-webkit-color-swatch { border: none; border-radius: 3px; }
+  #topbar #inkWidthInput {
+    width: 52px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  #topbar #zoomResetBtn {
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--fill);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #topbar #zoomResetBtn:hover { background: var(--fill-hover); }
+  #topbar #zoomResetBtn:active { transform: scale(0.96); }
+  #topbar #viewModeBtn {
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #topbar #viewModeBtn:hover { background: var(--accent); }
+  #topbar #viewModeBtn:active { transform: scale(0.96); }
+  #topbar .page-label { min-width: 0; }
+  #topbar .topbar-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-left: 14px; }
+  #topbar .topbar-label { font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: 0.02em; }
+  .topbar-btn {
+    border: none;
+    border-radius: 9px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  .topbar-btn:hover { background: var(--accent-hover); }
+  .topbar-btn:active { transform: scale(0.96); }
+  @media (max-width: 980px) {
+    #topbar .sub { display: none; }
+  }
+
+  #app { flex: 1; display: flex; min-height: 0; }
+
+  /* ---------------- Side panel ---------------- */
+  #controls {
+    width: 300px;
+    flex: 0 0 300px;
+    background: var(--sidebar);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    padding: 14px 12px 24px 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: none; /* stop scroll chaining + rubber-band past the end */
+    max-height: calc(100vh - var(--topbar-h));
+    border-right: 1px solid var(--separator);
+  }
+  #controls h1 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 3px 0;
+    color: var(--text);
+  }
+
+  #controls::-webkit-scrollbar { width: 8px; }
+  #controls::-webkit-scrollbar-track { background: transparent; }
+  #controls::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.18); border-radius: 4px; }
+  #controls::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
+
+  fieldset {
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    padding: 8px 10px 10px 10px;
+    background: var(--card);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    min-width: 0; /* let fieldsets shrink below their content's intrinsic min-width */
+  }
+  legend {
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.01em;
+    color: var(--text-2);
+    padding: 0 6px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 4px 0;
+    font-size: 12px;
+  }
+  .row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+  input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; }
+
+  .stepper { display: flex; align-items: center; gap: 6px; }
+  .stepper button {
+    width: 26px; height: 26px;
+    border: none;
+    background: var(--fill);
+    border-radius: 8px;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text);
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  .stepper button:hover { background: var(--fill-hover); }
+  .stepper button:active { transform: scale(0.96); }
+  .stepper input {
+    width: 36px;
+    text-align: center;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--separator);
+    border-radius: 8px;
+    padding: 3px 0;
+    background: #fff;
+    color: var(--text);
+  }
+
+  .fixed-note { font-size: 11px; color: var(--text-3); font-style: italic; }
+  .hint { font-size: 10px; color: var(--text-3); margin: 3px 0 1px 0; cursor: help; }
+  #controls textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    padding: 6px 8px;
+    border: 1px solid var(--separator);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+  }
+  #controls textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+    outline: none;
+  }
+
+  .ta-status {
+    font-size: 10px;
+    line-height: 1.35;
+    color: var(--red);
+    background: rgba(255, 59, 48, 0.06);
+    border: 1px solid rgba(255, 59, 48, 0.18);
+    border-radius: 6px;
+    padding: 3px 6px;
+    margin: 3px 0 0 0;
+    white-space: pre-wrap;
+    cursor: help;
+  }
+  .ta-status:empty { display: none; }
+
+  .format-ref {
+    margin-top: 6px;
+    font-size: 11px;
+    border: 1px solid var(--separator);
+    border-radius: 8px;
+    background: #fff;
+  }
+  .format-ref summary {
+    cursor: pointer;
+    padding: 5px 8px;
+    font-weight: 600;
+    color: var(--text-2);
+    user-select: none;
+  }
+  .format-ref summary:hover { color: var(--text); }
+  .format-ref .format-body { padding: 2px 8px 8px; border-top: 1px solid var(--separator); }
+  .format-col { margin-top: 6px; }
+  .format-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-3);
+    margin-bottom: 2px;
+  }
+  .format-ref pre {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  .format-ref code { background: var(--fill); border-radius: 3px; padding: 0 2px; }
+  .type-grid { display: flex; flex-wrap: wrap; gap: 3px; }
+  .type-chip {
+    font-size: 9px;
+    color: var(--text-2);
+    border: 1px solid var(--separator);
+    border-radius: 4px;
+    padding: 1px 4px;
+  }
+
+  #resetBtn {
+    width: 100%;
+    margin-top: 4px;
+    padding: 7px;
+    border: none;
+    border-radius: 9px;
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #resetBtn:hover { background: rgba(255, 59, 48, 0.16); }
+  #resetBtn:active { transform: scale(0.96); }
+
+  /* ---------------- Preview panel ---------------- */
+  #previewWrap {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 28px 32px 56px 32px;
+    overflow: hidden;
+    position: relative;
+  }
+  #zoomStage {
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+  /* Overlay editor for the memo box — sits on the canvas at the memo
+     geometry, scaled with the same factor as the canvas (set in JS). */
+  #memoEditor {
+    position: absolute;
+    z-index: 5;
+    border: 2px dashed #007aff;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 8px;
+    resize: none;
+    overflow: hidden;
+    line-height: 1.4;
+    font-family: Arial, Helvetica, sans-serif;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+    outline: none;
+  }
+  canvas {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: var(--shadow-page);
+    width: min(56vw, 620px);
+    height: auto;
+    display: block;
+  }
+  /* All-pages view: no background card — the sheets float directly on
+     the app's own background, so the canvas itself must be transparent
+     with no frame (no white bg, no rounded corners, no shadow). */
+  canvas.multi-view {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  @media print {
+    #topbar { display: none; }
+    #controls { display: none; }
+    html, body { background: #fff; }
+    #previewWrap { padding: 0; overflow: visible; }
+    #zoomStage { transform: none !important; }
+    canvas { width: 297mm !important; height: 420mm !important; box-shadow: none; border-radius: 0; }
+    @page { size: A3 portrait; margin: 0; }
+  }
+
+  /* ---------------- Floating menus (frosted material) ---------------- */
+  #shapeMenu,
+  #bookMenu,
+  #exportMenu,
+  #importMenu,
+  #trackMenu {
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 18px 44px rgba(0, 0, 0, 0.16);
+    padding: 8px;
+    z-index: 1000;
+    min-width: 190px;
+    transform-origin: top left;
+    animation: menu-in 0.16s cubic-bezier(0.3, 0.9, 0.4, 1);
+  }
+  /* Exit: a quick fade with a tiny downward drift — softer than the
+     enter, per motion restraint. hideFloatingMenu() (js/edit.js) adds
+     .closing and defers display:none until the fade ends; pointer-
+     events are off so the fading menu never blocks clicks. */
+  #shapeMenu.closing,
+  #bookMenu.closing,
+  #exportMenu.closing,
+  #importMenu.closing,
+  #trackMenu.closing {
+    animation: menu-out 0.13s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes menu-out {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.98) translateY(2px); }
+  }
+  #trackMenu { max-width: min(320px, calc(100vw - 16px)); }
+  #trackMenuHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 2px;
+  }
+  #trackMenuTitle {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-3);
+  }
+  #trackMenuCloseBtn {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--fill);
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #trackMenuCloseBtn:hover { background: var(--fill-hover); }
+  #trackMenuCloseBtn:active { transform: scale(0.96); }
+  #trackMenu .track-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  #trackMenu .track-row input[type="text"],
+  #trackMenu .track-row select {
+    width: 100%;
+    font-size: 12px;
+    padding: 6px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text);
+    box-sizing: border-box;
+  }
+  #trackMenu .track-row select { cursor: pointer; }
+  #trackMenu .track-row input[type="text"]:focus,
+  #trackMenu .track-row select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+    outline: none;
+  }
+  #trackMenu .track-actions {
+    display: flex;
+    gap: 6px;
+  }
+  #trackSaveBtn,
+  #trackDeleteBtn {
+    flex: 1;
+    padding: 7px 4px;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #trackSaveBtn {
+    background: var(--accent);
+    color: #fff;
+  }
+  #trackSaveBtn:hover { background: var(--accent-hover); }
+  #trackSaveBtn:active { transform: scale(0.96); }
+  #trackDeleteBtn {
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--red);
+    font-weight: 500;
+  }
+  #trackDeleteBtn:hover { background: rgba(255, 59, 48, 0.16); }
+  #trackDeleteBtn:active { transform: scale(0.96); }
+  #trackKfEditor {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  #trackKfEditor .track-kf-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    letter-spacing: 0.02em;
+    padding: 2px 2px 0 2px;
+  }
+  #trackKfEditor .track-kf-title span { font-weight: 500; color: var(--text-2); }
+  #trackKfList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 132px;
+    overflow-y: auto;
+  }
+  #trackKfList .track-kf-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+  }
+  #trackKfList .track-kf-row.selected {
+    background: rgba(0, 122, 255, 0.09);
+    border-color: rgba(0, 122, 255, 0.28);
+  }
+  #trackKfList .track-kf-label {
+    width: 44px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    padding: 4px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text);
+    box-sizing: border-box;
+  }
+  #trackKfList .track-kf-frame {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    padding: 4px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text);
+    box-sizing: border-box;
+  }
+  #trackKfList .track-kf-label:focus,
+  #trackKfList .track-kf-frame:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+    outline: none;
+  }
+  #trackKfList .track-kf-at { color: var(--text-3); font-size: 11px; flex-shrink: 0; }
+  #trackKfList .track-kf-del {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--red);
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #trackKfList .track-kf-del:hover { background: rgba(255, 59, 48, 0.18); }
+  #trackKfList .track-kf-del:active { transform: scale(0.96); }
+  #trackKfEditor .track-kf-actions {
+    display: flex;
+    gap: 5px;
+  }
+  #trackKfEditor .track-kf-actions button {
+    flex: 1;
+    padding: 5px 4px;
+    border: none;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--fill);
+    color: var(--text);
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #trackKfEditor .track-kf-actions button:hover:not(:disabled) { background: var(--fill-hover); }
+  #trackKfEditor .track-kf-actions button:active:not(:disabled) { transform: scale(0.96); }
+  #trackKfEditor .track-kf-actions button:disabled { opacity: 0.4; cursor: default; }
+  #exportMenu .export-menu-title,
+  #importMenu .export-menu-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    letter-spacing: 0.02em;
+    padding: 2px 6px 4px 6px;
+  }
+  #exportMenu .export-all {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px 6px 6px;
+    font-size: 11px;
+    color: var(--text-2);
+    cursor: pointer;
+  }
+  #exportMenu button,
+  #importMenu button {
+    width: 100%;
+    padding: 7px 10px;
+    border: none;
+    border-radius: 9px;
+    background: var(--fill);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #exportMenu button:hover,
+  #importMenu button:hover { background: var(--fill-hover); }
+  #exportMenu button:active,
+  #importMenu button:active { transform: scale(0.96); }
+  @keyframes menu-in {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  #shapeMenu .shape-row { display: flex; gap: 6px; }
+  #shapeMenu .shape-row button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 2px;
+    border: none;
+    background: var(--fill);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #shapeMenu .shape-row button span.sym { font-size: 17px; line-height: 1; }
+  #shapeMenu .shape-row button svg.sym { width: 20px; height: 20px; flex: none; }
+  #shapeMenu .shape-row button:hover { background: var(--fill-hover); }
+  #shapeMenu .shape-row button:active { transform: scale(0.96); }
+  #shapeMenu .shape-row button.active {
+    background: rgba(0, 122, 255, 0.14);
+    color: var(--accent);
+  }
+  #shapeMenu #markDeleteBtn {
+    width: 100%;
+    padding: 7px 4px;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--red);
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #shapeMenu #markDeleteBtn:hover { background: rgba(255, 59, 48, 0.16); }
+  #shapeMenu #markDeleteBtn:active { transform: scale(0.96); }
+
+  /* ---------------- Book divider menu ---------------- */
+  #bookMenu {
+    gap: 8px;
+    /* keep the menu compact even with many tags — the tag list wraps and
+       scrolls vertically instead of stretching the popup across the sheet */
+    max-width: min(320px, calc(100vw - 16px));
+  }
+  #bookMenuHead,
+  #shapeMenuHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 2px;
+  }
+  #bookMenuTitle,
+  #shapeMenuTitle {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-3);
+  }
+  #bookMenuCloseBtn,
+  #shapeMenuCloseBtn {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--fill);
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  #bookMenuCloseBtn:hover,
+  #shapeMenuCloseBtn:hover { background: var(--fill-hover); }
+  #bookMenuCloseBtn:active,
+  #shapeMenuCloseBtn:active { transform: scale(0.96); }
+  #bookMenu .book-tags { display: flex; flex-wrap: wrap; gap: 5px; max-height: 96px; overflow-y: auto; }
+  #bookMenu .book-tags:empty { display: none; }
+  #bookMenu #bookNameInput {
+    width: 100%;
+    font-size: 13px;
+    text-align: center;
+    padding: 6px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text);
+  }
+  #bookMenu #bookNameInput:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+    outline: none;
+  }
+  #bookDeleteBtn { background: rgba(255, 59, 48, 0.1); color: var(--red); }
+  #bookDeleteBtn:hover { background: rgba(255, 59, 48, 0.16); }
+  #bookDeleteBtn:active { transform: scale(0.96); }
+
+  /* ---------------- Book tags (chips) ---------------- */
+  .book-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .book-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    padding: 2px 5px 2px 8px;
+    border-radius: 999px;
+    background: rgba(0, 122, 255, 0.12);
+    color: var(--text);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .book-tag-x {
+    border: none;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 11px;
+    line-height: 1;
+    padding: 0 5px;
+    border-radius: 999px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 120ms ease, color 120ms ease, transform 80ms ease-out;
+  }
+  .book-tag-x:hover { background: rgba(0, 0, 0, 0.12); color: var(--text); }
+  .book-tag-x:active { transform: scale(0.96); }
+  .book-add-row { display: flex; gap: 5px; margin-top: 4px; }
+  .book-add-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 3px 6px;
+    border: 1px solid var(--separator);
+    border-radius: 8px;
+    font-size: 11px;
+    background: #fff;
+    color: var(--text);
+  }
+  .book-add-row input:focus { border-color: var(--accent); outline: none; }
+  .book-add-row button {
+    padding: 3px 10px;
+    border: none;
+    border-radius: 8px;
+    background: var(--fill);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  .book-add-row button:hover { background: var(--fill-hover); }
+  .book-add-row button:active { transform: scale(0.96); }
+
+  /* ---------------- Compact sidebar components ---------------- */
+  .sec { border-top: 1px solid var(--separator); padding: 5px 0 3px 0; }
+  .sec:first-child { border-top: none; padding-top: 0; }
+  .sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+  .sec-name { font-weight: 600; font-size: 12px; }
+  .sec-name-input { font-weight: 600; font-size: 12px; min-width: 0; flex: 1; padding: 2px 5px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--text); transition: border-color 120ms ease, background 120ms ease; }
+  .sec-name-input:hover { border-color: var(--separator); background: #fff; }
+  .sec-name-input:focus { border-color: var(--accent); background: #fff; outline: none; }
+  .col-labels { display: flex; flex-wrap: wrap; gap: 4px; margin: 3px 0; }
+  .col-labels input { width: 40px; min-width: 0; padding: 2px 3px; border: 1px solid var(--separator); border-radius: 6px; font-size: 11px; text-align: center; background: #fff; color: var(--text); }
+  .col-labels input:focus { border-color: var(--accent); outline: none; }
+  .sec-row { display: flex; align-items: center; gap: 8px; font-size: 12px; margin: 1px 0; }
+  .sec-row .chk { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+  .sec-row .spacer { flex: 1; }
+  .chk { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 12px; }
+  .chk input { margin: 0; }
+  .chk.block { margin-top: 4px; }
+  .lbl { font-size: 12px; }
+  .lbl small { color: var(--text-2); }
+  .center { justify-content: center; gap: 6px; }
+  .page-label { min-width: 84px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .num-input { width: 64px; text-align: center; padding: 4px 6px; border: 1px solid var(--separator); border-radius: 8px; font-size: 12px; font-variant-numeric: tabular-nums; background: #fff; color: var(--text); }
+  .layout-label { font-weight: 600; font-size: 12px; margin-top: 6px; }
+  #controls select {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    background: var(--fill);
+    color: var(--text);
+    cursor: pointer;
+    margin-left: auto;   /* hug the right edge of the row */
+    flex-shrink: 0;      /* keep the label row from squeezing the dropdown */
+  }
+  #controls select:hover { background: var(--fill-hover); }
+
+  /* ---------------- Buttons ---------------- */
+  .btn-primary,
+  .btn-danger,
+  .btn-secondary,
+  .btn-ghost {
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: background 150ms ease, transform 80ms ease-out;
+  }
+  .btn-primary { width: 100%; margin-top: 5px; padding: 6px; border: none; background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-danger { width: 100%; margin-top: 5px; padding: 6px; border: none; background: var(--red); color: #fff; }
+  .btn-danger:hover { background: var(--red-hover); }
+  .btn-secondary { width: 100%; padding: 6px; border: none; background: var(--fill); color: var(--text); }
+  .btn-secondary:hover { background: var(--fill-hover); }
+  .btn-ghost { padding: 5px 10px; border: none; background: var(--fill); color: var(--text); }
+  .btn-ghost:hover { background: var(--fill-hover); }
+  .btn-ghost:disabled { opacity: 0.4; cursor: default; background: var(--fill); }
+  .btn-primary:active, .btn-danger:active, .btn-secondary:active, .btn-ghost:active, #resetBtn:active { transform: scale(0.96); }
+  .flex { flex: 1; }
+
+  /* Mode toggles: light fill that lights up blue when on (JS sets inline background + color) */
+  #customizeToggleBtn, #syncToggleBtn { background: var(--fill); color: var(--text); }
+  #customizeToggleBtn:hover, #syncToggleBtn:hover { background: var(--fill-hover); }
+
+  /* ---------------- Focus & accessibility ---------------- */
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: 2px solid rgba(0, 122, 255, 0.6);
+    outline-offset: 2px;
+  }
+  .num-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+    outline: none;
+  }
+
+  /* ---------------- Canvas cursor states ---------------- */
+  canvas { cursor: pointer; }
+  canvas.panning-ready { cursor: grab; }
+  canvas.panning-active { cursor: grabbing; }
+  canvas.mark-ready { cursor: grab; }
+  canvas.mark-dragging { cursor: grabbing; }
+  canvas.marquee-ready { cursor: crosshair; }
+  canvas.marquee-dragging { cursor: crosshair; }
+  canvas.fill-ready { cursor: crosshair; }
+  canvas.fill-dragging { cursor: crosshair; }
+  canvas.time-ready { cursor: ns-resize; }
+  canvas.time-dragging { cursor: ns-resize; }
+  canvas.track-edge-ready { cursor: ns-resize; }
+  canvas.track-move-ready { cursor: move; }
+
+  /* ---------------- Reduced motion / transparency ---------------- */
+  @media (prefers-reduced-motion: reduce) {
+    #shapeMenu, #bookMenu, #exportMenu, #importMenu, #trackMenu { animation: none; }
+    button, input, select { transition: none; }
+    button:active, #resetBtn:active { transform: none; }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    #topbar { background: #f7f7f9; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    #controls { background: #f5f5f7; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    #shapeMenu, #bookMenu, #exportMenu, #importMenu, #trackMenu { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
